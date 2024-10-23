@@ -101,11 +101,12 @@ def get_id(RGI,glathida,verbose,i):
         lambda row: geodesic((row.CenLat,row.CenLon),glathida_ll),
             axis = 1
     )
-    
-    RGI_index = pd.Series(np.argmin(distances), name = 'RGI_indexes')
     centroid_distance = distances.min()
-    number_glaciers_matched = len(RGI_index)
+    min_indices = np.where(distances == centroid_distance)
 
+    RGI_index = pd.Series(min_indices, name = 'RGI_indexes')
+    number_glaciers_matched = len(RGI_index)
+    print(number_glaciers_matched)
     if len(RGI_index) == 1:
         RGI_id_match = (RGI['RGIId'].iloc[RGI_index.loc[0]])
     else:
@@ -157,7 +158,7 @@ def coregister_data(
     config.read('model_coregistration.txt')   
     
     
-    df['RGI Centroid Distance'] = df['RGI Centroid Distance'].astype(str).str[:-2].astype(float)
+    # df['RGI Centroid Distance'] = df['RGI Centroid Distance'].astype(str).str[:-2].astype(float)
     df['RGI Centroid Distance'] = df['RGI Centroid Distance'] * 1e3
 
     rad = np.sqrt((df['Area']*1e6) / np.pi)
@@ -338,7 +339,7 @@ def load_LOO_data(
     df = pd.read_pickle(os.path.join(home_path,'models','LOO','rgi_est_raw.pkl')) 
     
     cols = []
-    for i in range(273):
+    for i in range(202):
         cols.append(i)
     df[cols] = np.round(df[cols],0)
     df[cols] = df[cols] / 1e3
